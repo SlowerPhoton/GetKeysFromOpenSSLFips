@@ -3,7 +3,7 @@
 VERSIONS_DIR=versions
 OUT=compilable.txt
 FIPS_BRANCH=OpenSSL-fips-2_0-stable
-DAYS=365
+DAYS=10365 #try everything
 
 REMOVE_OPENSSL=false
 REMOVE_VERSIONS=false
@@ -31,12 +31,12 @@ fi
 
 ( cd openssl; git tag --merged origin/$FIPS_BRANCH --sort=creatordate; ) | while read FIPS_VERSION
 do
-	mkdir -p $INSTALLDIR
+	set -x; mkdir -p $INSTALLDIR; set +x
 	echo attempting to install $FIPS_VERSION >> $OUT
 	if bash installFipsModuleFromOpenssl.sh $FIPS_VERSION $INSTALLDIR $VERSIONS_DIR
 	then
 		echo module $FIPS_VERSION installed correctly >> $OUT
-		mv $INSTALLDIR fips-backup
+		mv -T $INSTALLDIR fips-backup
 		( bash relevantVersions.sh $FIPS_VERSION $DAYS ) | while read VERSION
 		do	
 			cp -r fips-backup $INSTALLDIR
@@ -54,7 +54,7 @@ do
 		done
 		rm -r fips-backup
 	fi
-	rm -r $INSTALLDIR
+	set -x; rm -r $INSTALLDIR; set +x
 done
 
 if "$REMOVE_OPENSSL"

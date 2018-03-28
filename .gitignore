@@ -3,4 +3,4 @@ versions/
 openssl/
 compilable.txt
 testscript.sh
-
+*.swp
